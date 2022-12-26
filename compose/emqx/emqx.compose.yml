@@ -8,7 +8,7 @@ volumes:
 
 services:
   emqx1:
-    image: emqx:latest
+    image: emqx:5
     restart: unless-stopped
     environment:
       - EMQX_NAME=emqx
@@ -47,6 +47,9 @@ networks:
     driver: bridge
 
 volumes:
-  emqx-data: {}
-  emqx-log: {}
-  emqx-etc: {}
+  emqx-data:
+    name: emqx-data
+  emqx-log:
+    name: emqx-log
+  emqx-etc:
+    name: emqx-conf
