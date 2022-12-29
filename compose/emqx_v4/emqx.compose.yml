@@ -1,0 +1,54 @@
+volumes:
+  vol-emqx-data:
+    name: emqx-data
+  vol-emqx-etc:
+    name: emqx-etc
+  vol-emqx-log:
+    name: emqx-log
+
+services:
+  emqx1:
+    image: emqx:4
+    restart: unless-stopped
+    environment:
+      - EMQX_NAME=emqx
+      - EMQX_HOST=node1.emqx.io
+      - EMQX_CLUSTER__DISCOVERY_STRATEGY=static
+      - EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.io]
+      - EMQX_LOADED_PLUGINS="emqx_recon,emqx_retainer,emqx_management,emqx_dashboard"
+    volumes:
+      - emqx-data:/opt/emqx/data
+      - emqx-log:/opt/emqx/log
+      - emqx-etc:/opt/emqx/etc
+    ports:
+      - "1883:1883"  # mqtt:tcp
+      - "1884:8883"  # mqtt:tcp:ssl
+      - "1893:8083"  # mqtt:ws
+      - "1894:8084"  # mqtt:ws:ssl
+      - "8000:8081"  # http:management
+      - "8001:18083"  # http:dashboard
+    networks:
+      emqx-bridge:
+        aliases:
+        - node1.emqx.io
+    healthcheck:
+      test: ["CMD", "/opt/emqx/bin/emqx_ctl", "status"]
+      interval: 5s
+      timeout: 25s
+      retries: 5
+    networks:
+      emqx-net:
+        aliases:
+        - node1.emqx.io
+
+networks:
+  emqx-net:
+    driver: bridge
+
+volumes:
+  emqx-data:
+    name: emqx-data
+  emqx-log:
+    name: emqx-log
+  emqx-etc:
+    name: emqx-conf

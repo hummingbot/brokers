@@ -16,7 +16,6 @@ services:
       - EMQX_CLUSTER__DISCOVERY_STRATEGY=static
       - EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.io]
       - EMQX_LOADED_PLUGINS="emqx_recon,emqx_retainer,emqx_management,emqx_dashboard"
-      # - EMQX_LOG__LEVEL=debug
     volumes:
       - emqx-data:/opt/emqx/data
       - emqx-log:/opt/emqx/log

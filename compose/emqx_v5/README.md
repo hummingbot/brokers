@@ -1,6 +1,6 @@
 # Deploy EMQX v5 broker using docker compose
 
-To deploy [EMQX Broker] run the `launch.sh` script
+To deploy [EMQX Broker](https://www.emqx.io/docs/en/v5.0/) run the `launch.sh` script
 
 ```
 ./launch.sh

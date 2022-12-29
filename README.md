@@ -124,6 +124,15 @@ We suggest the following brokers:
 - EMQX
 
 
+## Broker deployments
+
+We included deployments for various message brokers. Currently only
+docker compose deployments are developed. You can find deployment manifests and
+scripts for EMQXv4, EMQXv5 and RabbitMQ message brokers under the
+[compose/](https://github.com/klpanagi/hummingbot-brokers/tree/main/compose/)
+directory of this repository.
+
+
 ## Encrypted broker communication (SSL connections)
 
 To enable ssl connections for the hummingbot client Just set the `mqtt_ssl` parameter to `True`.
