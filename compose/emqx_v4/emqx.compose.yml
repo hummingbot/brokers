@@ -1,10 +1,5 @@
-volumes:
-  vol-emqx-data:
-    name: emqx-data
-  vol-emqx-etc:
-    name: emqx-etc
-  vol-emqx-log:
-    name: emqx-log
+version: '3.9'
+name: hummingbot_broker
 
 services:
   emqx1:
