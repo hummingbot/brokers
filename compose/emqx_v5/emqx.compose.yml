@@ -7,9 +7,9 @@ services:
     restart: unless-stopped
     environment:
       - EMQX_NAME=emqx
-      - EMQX_HOST=node1.emqx.io
+      - EMQX_HOST=node1.emqx.local
       - EMQX_CLUSTER__DISCOVERY_STRATEGY=static
-      - EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.io]
+      - EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.local]
       - EMQX_LOADED_PLUGINS="emqx_recon,emqx_retainer,emqx_management,emqx_dashboard"
     volumes:
       - emqx-data:/opt/emqx/data
@@ -25,12 +25,26 @@ services:
     networks:
       emqx-bridge:
         aliases:
-        - node1.emqx.io
+        - node1.emqx.local
     healthcheck:
       test: ["CMD", "/opt/emqx/bin/emqx_ctl", "status"]
       interval: 5s
       timeout: 25s
       retries: 5
+
+  prometheus:
+    image: prom/prometheus:v2.21.0
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+    networks:
+      emqx-bridge:
+        aliases:
+        - prometheus.emqx.local
+
 
 networks:
   emqx-bridge:
@@ -40,3 +54,4 @@ volumes:
   emqx-data: {}
   emqx-log: {}
   emqx-etc: {}
+  prometheus-data: {}
