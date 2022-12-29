@@ -36,19 +36,12 @@ services:
       interval: 5s
       timeout: 25s
       retries: 5
-    networks:
-      emqx-net:
-        aliases:
-        - node1.emqx.io
 
 networks:
-  emqx-net:
+  emqx-bridge:
     driver: bridge
 
 volumes:
-  emqx-data:
-    name: emqx-data
-  emqx-log:
-    name: emqx-log
-  emqx-etc:
-    name: emqx-conf
+  emqx-data: {}
+  emqx-log: {}
+  emqx-etc: {}
