@@ -32,19 +32,18 @@ services:
       timeout: 25s
       retries: 5
 
-  prometheus:
-    image: prom/prometheus:v2.21.0
-    ports:
-      - 9090:9090
-    volumes:
-      - ./prometheus:/etc/prometheus
-      - prometheus-data:/prometheus
-    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
-    networks:
-      emqx-bridge:
-        aliases:
-        - prometheus.emqx.local
-
+  # prometheus:
+  #   image: prom/prometheus:v2.21.0
+  #   ports:
+  #     - 9090:9090
+  #   volumes:
+  #     - ./prometheus:/etc/prometheus
+  #     - prometheus-data:/prometheus
+  #   command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+  #   networks:
+  #     emqx-bridge:
+  #       aliases:
+  #       - prometheus.emqx.local
 
 networks:
   emqx-bridge:
