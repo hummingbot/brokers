@@ -1,0 +1,22 @@
+# prometheus.yaml
+global:
+  scrape_interval:     10s # The default scrape interval is every 10 seconds.
+  evaluation_interval: 10s # The default evaluation interval is every 10 seconds.
+  # On this machine, every time series will be exported by default.
+  external_labels:
+    monitor: 'emqx-monitor'
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first.rules"
+  # - "second.rules"
+  - "/etc/prometheus/rules/*.rules"
+# Data pull configuration
+scrape_configs:
+  # EMQX monitoring
+  - job_name: 'emqx'
+    metrics_path: /api/v5/prometheus/stats
+    scrape_interval: 5s
+    honor_labels: true
+    static_configs:
+      # EMQX IP endpoint
+      - targets: ['node1.emqx.local:18083']
