@@ -1,8 +1,10 @@
-version: "3.2"
+version: '3.9'
+name: hummingbot_broker
+
 services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: 'rabbitmq'
+    restart: unless-stopped
     ports:
       - 5672:5672    # AMQP
       - 15672:15672  # Management
@@ -17,8 +19,13 @@ services:
       - ./rabbitmq/data:/var/lib/rabbitmq/mnesia/rabbit@my-rabbit
       - ./rabbitmq/logs:/var/log/rabbitmq/log
     networks:
-      - hbotnet
+      - rabbit-net
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 30s
+      retries: 5
 
 networks:
-  hbotnet:
+  rabbit-net:
     driver: bridge
