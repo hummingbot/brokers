@@ -220,6 +220,7 @@ if __name__ == "__main__":
         port=1883,
         username='',
         password='',
+        bot_id='bot1',
         notifications=True,
         events=True,
         logs=True,
