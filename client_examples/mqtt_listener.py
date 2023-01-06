@@ -1,5 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
+import asyncio
 from commlib.node import Node
 from commlib.transports.mqtt import ConnectionParameters
 from typing import Any, List, Optional, Tuple
@@ -212,6 +213,11 @@ class HummingbotMQTTListener(Node):
         self._init_endpoints()
         self.run()
 
+    async def run_forever(self):
+        self.start()
+        while True:
+            await asyncio.sleep(0.01)
+
 
 if __name__ == "__main__":
     import time
@@ -226,6 +232,4 @@ if __name__ == "__main__":
         logs=True,
         heartbeats=False
     )
-    client.start()
-    while True:
-        time.sleep(0.01)
+    asyncio.new_event_loop().run_until_complete(client.run_forever())
