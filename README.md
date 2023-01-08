@@ -97,7 +97,7 @@ The MQTT feature is fully configured via global parameters (`client_config`).
       | ∟ mqtt_autostart         | False                |
 ```
 
-Finally, `Bot ID` can be set via the `instance_id` global configuration parameter. If left empty, a random UID is generated and used for each bot
+Finally, the ID of the bot that is used for the construction of the bot-specific communication topics can be set via the `instance_id` global configuration parameter. If left empty, a random UID is generated and used for each bot
 deployment.
 
 ```
@@ -108,11 +108,36 @@ deployment.
       | instance_id              | testbot              |
 ```
 
-## Start / Stop MQTT Bridge
+## Start / Stop / Restart MQTT Bridge
 
 The `bot_orchestration` layer of the hummingbot codebase introduces the `mqtt` command
 for managing connections to message brokers via MQTT transport.
 
+![2023-01-08-165455_950x242_scrot](https://user-images.githubusercontent.com/4770702/211204914-6aca8478-4cf5-4d85-99ce-cff5993650f9.png)
+
+The mqtt command includes three subcommands: `start/stop/restart`.
+
+To start the MQTT Bridge execute the `mqtt start` command.
+
+```
+>>>  mqtt start
+MQTT Bridge connected with success.
+```
+
+To stop the MQTT Bridge execute the `mqtt stop` command.
+
+```
+>>>  mqtt stop
+MQTT Bridge disconnected
+```
+
+To restart the MQTT Bridge execute the `mqtt restart` command.
+
+```
+>>>  mqtt restart
+MQTT Bridge disconnected
+MQTT Bridge connected with success.
+```
 
 ## Use a private broker deployment
 
