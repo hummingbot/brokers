@@ -19,7 +19,7 @@ development of bot collaboration schemas in the future.
         |      +--------------+     |
         |      |              |     |
         |      |              |     |
-        +------+  MQTT Broker +-----+
+        +------+    Broker    +-----+
                |              |
             +--+              +-----+
             |  +--------------+     |
@@ -45,6 +45,7 @@ The following commands are bridged:
 - import
 - config
 - balance limit
+- balance paper
 - history
 - status
 
