@@ -1,0 +1,68 @@
+version: '3.9'
+name: hummingbot_broker
+
+services:
+  emqx1:
+    image: emqx:5
+    restart: unless-stopped
+    environment:
+      - EMQX_NAME=emqx
+      - EMQX_HOST=node1.emqx.local
+      - EMQX_CLUSTER__DISCOVERY_STRATEGY=static
+      - EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.local]
+      - EMQX_LOADED_PLUGINS="emqx_recon,emqx_retainer,emqx_management,emqx_dashboard"
+    volumes:
+      - emqx-data:/opt/emqx/data
+      - emqx-log:/opt/emqx/log
+      - emqx-etc:/opt/emqx/etc
+    ports:
+      - "1883:1883"  # mqtt:tcp
+      - "8833:8883"  # mqtt:tcp:ssl
+      - "8083:8083"  # mqtt:ws
+      - "8084:8084"  # mqtt:ws:ssl
+      - "8081:8081"  # http:management
+      - "18083:18083"  # http:dashboard
+    networks:
+      emqx-bridge:
+        aliases:
+        - node1.emqx.local
+    healthcheck:
+      test: ["CMD", "/opt/emqx/bin/emqx_ctl", "status"]
+      interval: 5s
+      timeout: 25s
+      retries: 5
+
+  prometheus:
+    image: prom/prometheus:v2.41.0
+    ports:
+      - "9090:9090"
+    command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-storage:/prometheus
+    networks:
+      emqx-bridge:
+        aliases:
+        - prometheus.local
+
+  grafana:
+    image: grafana/grafana:9.3.2
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    networks:
+      emqx-bridge:
+        aliases:
+        - grafana.local
+
+networks:
+  emqx-bridge:
+    driver: bridge
+
+volumes:
+  emqx-data: {}
+  emqx-log: {}
+  emqx-etc: {}
+  prometheus-storage: {}
+  grafana-storage: {}

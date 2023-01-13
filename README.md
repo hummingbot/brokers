@@ -19,7 +19,7 @@ development of bot collaboration schemas in the future.
         |      +--------------+     |
         |      |              |     |
         |      |              |     |
-        +------+  MQTT Broker +-----+
+        +------+    Broker    +-----+
                |              |
             +--+              +-----+
             |  +--------------+     |
@@ -45,6 +45,7 @@ The following commands are bridged:
 - import
 - config
 - balance limit
+- balance paper
 - history
 - status
 
@@ -52,14 +53,14 @@ Below is the list of bridged command interfaces among with their properties:
 
 | ID | URI | Request | Response |
 |--------------|-----------|------------|------------| 
-| start | `hbot/{botID}/start` | `{"log_level": "str", "restore": bool, "script": str, "is_quickstart": bool}` | `{"status": int, "msg": str}` |
-| stop | `hbot/{botID}/stop` | `{"skip_order_cancellation": bool}` | `{"status": int, "msg": str}` |
-| import | `hbot/{botID}/import` | `{"strategy": str}` | `{"status": int, "msg": str}` |
-| config | `hbot/{botID}/config` | `{"params": List[Tuple[str, Any]]}` | `{"status": int, "msg": str, "changes": List[Dict[str, Any]]}` |
-| balance limit | `hbot/{botID}/balance/limit` | `{"exchange": str, "asset": str, "amount": float}` | `{"status": int, "msg": str, "data": str}` |
-| balance paper | `hbot/{botID}/balance/paper` | `{"asset": str, "amount": float}` | `{"status": int, "msg": str, "data": str}` |
-| history | `hbot/{botID}/history` | `{"days": float, "verbose": bool, "precision": int}` | `{"status": int, "msg": str, "trades": List[Any]}` |
-| status | `hbot/{botID}/status` | `{}` | `{"status": int, "msg": str, "data": str}` |
+| start | `hbot/{instance_id}/start` | `{"log_level": "str", "restore": bool, "script": str, "is_quickstart": bool}` | `{"status": int, "msg": str}` |
+| stop | `hbot/{instance_id}/stop` | `{"skip_order_cancellation": bool}` | `{"status": int, "msg": str}` |
+| import | `hbot/{instance_id}/import` | `{"strategy": str}` | `{"status": int, "msg": str}` |
+| config | `hbot/{instance_id}/config` | `{"params": List[Tuple[str, Any]]}` | `{"status": int, "msg": str, "changes": List[Dict[str, Any]]}` |
+| balance limit | `hbot/{instance_id}/balance/limit` | `{"exchange": str, "asset": str, "amount": float}` | `{"status": int, "msg": str, "data": str}` |
+| balance paper | `hbot/{instance_id}/balance/paper` | `{"asset": str, "amount": float}` | `{"status": int, "msg": str, "data": str}` |
+| history | `hbot/{instance_id}/history` | `{"days": float, "verbose": bool, "precision": int}` | `{"status": int, "msg": str, "trades": List[Any]}` |
+| status | `hbot/{instance_id}/status` | `{}` | `{"status": int, "msg": str, "data": str}` |
 
 Furthermore, the MQTT bridge, implemented as part of the hummingbot client,
 forwards internal Events, Notifications and Logs to the MQTT broker.
@@ -68,10 +69,10 @@ Below is the list of bridged publishing interfaces among with their properties:
 
 | ID | URI | Message |
 |--------------|-----------|------------|
-| Heartbeats | `hbot/{botID}/hb` | `{}` |
-| Events | `hbot/{botID}/events` | `{"timestamp": int, "type": str, "data": Dict[str,Any]}` |
-| Notifications | `hbot/{botID}/notify` | `{'seq': int, 'timestamp': int, 'msg': str}` |
-| Logs | `hbot/{botID}/log` | `{'timestamp': 0.0, 'msg': '', 'level_no': 0, 'level_name': '', 'logger_name': ''}` |
+| Heartbeats | `hbot/{instance_id}/hb` | `{}` |
+| Events | `hbot/{instance_id}/events` | `{"timestamp": int, "type": str, "data": Dict[str,Any]}` |
+| Notifications | `hbot/{instance_id}/notify` | `{'seq': int, 'timestamp': int, 'msg': str}` |
+| Logs | `hbot/{instance_id}/log` | `{'timestamp': 0.0, 'msg': '', 'level_no': 0, 'level_name': '', 'logger_name': ''}` |
 
 # Usage
 
@@ -97,11 +98,7 @@ The MQTT feature is fully configured via global parameters (`client_config`).
       | ∟ mqtt_autostart         | False                |
 ```
 
-Use the `mqtt_start` command from the client TUI to initiate MQTT bridge.
-Alternatively, you can use the `mqtt_autostart` config parameter to autostart
-MQTT connections on startup.
-
-Finally, `Bot ID` can be set via the `instance_id` global configuration parameter. If left empty, a random UID is generated and used for each bot
+Finally, the ID of the bot that is used for the construction of the bot-specific communication topics can be set via the `instance_id` global configuration parameter. If left empty, a random UID is generated and used for each bot
 deployment.
 
 ```
@@ -110,6 +107,37 @@ deployment.
       | Key                      | Value                |
       |--------------------------+----------------------|
       | instance_id              | testbot              |
+```
+
+## Start / Stop / Restart MQTT Bridge
+
+The `bot_orchestration` layer of the hummingbot codebase introduces the `mqtt` command
+for managing connections to message brokers via MQTT transport.
+
+![2023-01-08-165455_950x242_scrot](https://user-images.githubusercontent.com/4770702/211204914-6aca8478-4cf5-4d85-99ce-cff5993650f9.png)
+
+The mqtt command includes three subcommands: `start/stop/restart`.
+
+To start the MQTT Bridge execute the `mqtt start` command.
+
+```
+>>>  mqtt start
+MQTT Bridge connected with success.
+```
+
+To stop the MQTT Bridge execute the `mqtt stop` command.
+
+```
+>>>  mqtt stop
+MQTT Bridge disconnected
+```
+
+To restart the MQTT Bridge execute the `mqtt restart` command.
+
+```
+>>>  mqtt restart
+MQTT Bridge disconnected
+MQTT Bridge connected with success.
 ```
 
 ## Use a private broker deployment
@@ -122,6 +150,16 @@ We suggest the following brokers:
 - RabbitMQ
 - MosquittoMQTT
 - EMQX
+
+
+## Broker deployments
+
+We included deployments for various message brokers. Currently only
+docker compose deployments are developed. You can find deployment manifests and
+scripts for EMQXv4, EMQXv5 and RabbitMQ message brokers under the
+[compose/](https://github.com/klpanagi/hummingbot-brokers/tree/main/compose/)
+directory of this repository. Furthermore you can find an deployment that
+includes an Observability layer for EMQXv5 using the `Prometheus + Grafana` stack.
 
 
 ## Encrypted broker communication (SSL connections)
@@ -142,15 +180,20 @@ Though, for scenarios where public message brokers are used (e.g. having a Rabbi
 it is highly recommended to always use SSL connections to avoid stealing critical data from man-in-the-middle attacks.
 
 
-## Communicate remotely with your bots via MQTT
+## Communicate remotely with your bots via a Message broker
 
 MQTT endpoints provided by hummingbot bot instances can be accesses using common mqtt client
-libraries.
+libraries. Though any Message broker that supports the MQTT protocol can be used, such as 
+RabbitMQ and clients can connect via several transports. For example, RabbitMQ
+supports the MQTT, AMQP, STOMP, Web-MQTT and Web-STOMP protocols. Web-enabled
+transports (Web-MQTT, Web-STOMP) can be used to access hummingbot bot resources (remote control and monitoring interfaces)
+from the web. This allows the implementation of web apps and web-based user
+interfaces for hummingbot environments.
 
-Though, [commlib\-py](https://github.com/robotics-4-all/commlib-py) Python library 
-is recommended as it implements common communication patters such as pure PubSub 
-and RPCs, which are used on the bot side. For example, bot commands are implemented 
-using the RPC pattern, that is not provided by default for the MQTT protocol.
+The [commlib\-py](https://github.com/robotics-4-all/commlib-py) Python library 
+is recommended for developing side components as it implements common communication 
+patters such as pure PubSub  and RPCs, which are used on the bot side. For example, bot commands 
+are implemented using the RPC pattern, that is not provided by default for the MQTT protocol.
 
 For test purposes, you can install and use the [commlib-cli](https://github.com/robotics-4-all/commlib-cli) package.
 Below are examples of remotely communicating with hummigbot bots via MQTT using 
