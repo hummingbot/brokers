@@ -168,6 +168,8 @@ is recommended for developing side components as it implements common communicat
 patters such as pure PubSub  and RPCs, which are used on the bot side. For example, bot commands 
 are implemented using the RPC pattern, that is not provided by default for the MQTT protocol.
 
+Furthermore, the last contribution to this PR developed a remote client library in Python, for easily developing software and applications which interract with bot instances. The library is hosted at https://github.com/hummingbot/hbot-remote-client-py and provides a `RemoteListener` and `RemoteCommands` classes for both listening to bot events and sending commands remotely.
+
 For test purposes, you can install and use the [commlib-cli](https://github.com/robotics-4-all/commlib-cli) package.
 Below are examples of remotely communicating with hummigbot bots via MQTT using 
 the `commlib-cli` package.
