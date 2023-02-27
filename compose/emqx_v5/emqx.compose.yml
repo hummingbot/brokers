@@ -22,6 +22,7 @@ services:
       - "8084:8084"  # mqtt:ws:ssl
       - "8081:8081"  # http:management
       - "18083:18083"  # http:dashboard
+      - "61613:61613"  # web-stomp gateway
     networks:
       emqx-bridge:
         aliases:
@@ -40,4 +41,3 @@ volumes:
   emqx-data: {}
   emqx-log: {}
   emqx-etc: {}
-  prometheus-data: {}

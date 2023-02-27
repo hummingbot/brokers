@@ -10,28 +10,8 @@ The goal of this project is to enable remote control and monitoring of Bot
 instances towards a plugin-based approach of building HF AMM bots and the
 development of bot collaboration schemas in the future.
 
-```
-    +-------+                   +-------+
-    |       |                   |       |
-    | BOT A |                   | BOT B |
-    |       |                   |       |
-    +---+---+                   +---+---+
-        |      +--------------+     |
-        |      |              |     |
-        |      |              |     |
-        +------+    Broker    +-----+
-               |              |
-            +--+              +-----+
-            |  +--------------+     |
-            |                       |
-     +------+------+       +--------+------+
-     |             |       |               |
-     | TradingView |       | Orchestration |
-     |   Plugin    |       |    Plugin     |
-     |             |       |               |
-     +-------------+       +---------------+
+![Bot_Coordination_Architecture-Page-1](https://user-images.githubusercontent.com/4770702/213018080-81a93ef0-0a12-4dd3-8746-27cd97a3e4e2.png)
 
-```
 
 In the context of the current project the MQTT protocol is supported, though
 extending to support more protocols, such as AMQP and Redis, was taken into
@@ -65,6 +45,9 @@ Below is the list of bridged command interfaces among with their properties:
 Furthermore, the MQTT bridge, implemented as part of the hummingbot client,
 forwards internal Events, Notifications and Logs to the MQTT broker.
 
+![Bot_Coordination_Architecture-Page-2](https://user-images.githubusercontent.com/4770702/213018674-18aed5c9-ef96-41ac-9a7c-2fcc19bc299a.png)
+
+
 Below is the list of bridged publishing interfaces among with their properties:
 
 | ID | URI | Message |
@@ -76,27 +59,12 @@ Below is the list of bridged publishing interfaces among with their properties:
 
 # Usage
 
-The MQTT feature is fully configured via global parameters (`client_config`).
+## Configuration of the MQTT Bridge in Hummingbot
 
-```
-  Global Configurations:                                  
-      +--------------------------+----------------------+
-      | Key                      | Value                |
-      |--------------------------+----------------------|
-      | instance_id              | testbot              |
-        ...
-      | mqtt_bridge              |                      |
-      | ∟ mqtt_host              | localhost            |
-      | ∟ mqtt_port              | 1883                 |
-      | ∟ mqtt_username          |                      |
-      | ∟ mqtt_password          |                      |
-      | ∟ mqtt_ssl               | False                |
-      | ∟ mqtt_logger            | True                 |
-      | ∟ mqtt_notifier          | True                 |
-      | ∟ mqtt_commands          | True                 |
-      | ∟ mqtt_events            | True                 |
-      | ∟ mqtt_autostart         | False                |
-```
+The MQTT feature can be completely configured via global parameters in hummingbot client, or via direct editing of the `client_config.yml` file.
+
+![2023-01-17-235142_451x363_scrot](https://user-images.githubusercontent.com/4770702/213020323-a88821df-0e70-44f4-8129-b91f48c97937.png)
+
 
 Finally, the ID of the bot that is used for the construction of the bot-specific communication topics can be set via the `instance_id` global configuration parameter. If left empty, a random UID is generated and used for each bot
 deployment.
@@ -108,6 +76,9 @@ deployment.
       |--------------------------+----------------------|
       | instance_id              | testbot              |
 ```
+
+![2023-01-17-235035_611x98_scrot](https://user-images.githubusercontent.com/4770702/213020129-2c18b364-5e77-4f95-873c-4ffd9ac34780.png)
+
 
 ## Start / Stop / Restart MQTT Bridge
 
@@ -140,7 +111,7 @@ MQTT Bridge disconnected
 MQTT Bridge connected with success.
 ```
 
-## Use a private broker deployment
+## Message Broker
 
 Currently, the current implementation supports only the MQTT protocol for 
 connecting to message brokers (feature releases will also support AMQP, Redis and Kafka).
@@ -151,8 +122,10 @@ We suggest the following brokers:
 - MosquittoMQTT
 - EMQX
 
+Though, a huge advance of this architectural approach is that most message brokers support various transports for communication, beyond MQTT, such as STOMP, MQTT and STOMP over websockets for direct web integration, CoAP etc. For example, in the case of using a RabbitMQ message broker, you can communicate with bots via AMQP, MQTT, STOMP and MQTT and STOMP over websockets.
 
-## Broker deployments
+![Bot_Coordination_Architecture-Page-3](https://user-images.githubusercontent.com/4770702/213021471-c8812e4a-7488-4a6c-8dbe-0841b14a751a.png)
+
 
 We included deployments for various message brokers. Currently only
 docker compose deployments are developed. You can find deployment manifests and
@@ -194,6 +167,8 @@ The [commlib\-py](https://github.com/robotics-4-all/commlib-py) Python library
 is recommended for developing side components as it implements common communication 
 patters such as pure PubSub  and RPCs, which are used on the bot side. For example, bot commands 
 are implemented using the RPC pattern, that is not provided by default for the MQTT protocol.
+
+Furthermore, the last contribution to this PR developed a remote client library in Python, for easily developing software and applications which interract with bot instances. The library is hosted at https://github.com/hummingbot/hbot-remote-client-py and provides a `RemoteListener` and `RemoteCommands` classes for both listening to bot events and sending commands remotely.
 
 For test purposes, you can install and use the [commlib-cli](https://github.com/robotics-4-all/commlib-cli) package.
 Below are examples of remotely communicating with hummigbot bots via MQTT using 
