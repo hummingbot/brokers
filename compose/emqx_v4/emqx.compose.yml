@@ -2,7 +2,7 @@ version: '3.9'
 name: hummingbot_broker
 
 services:
-  emqx1:
+  emqx4:
     image: emqx:4
     restart: unless-stopped
     environment:
@@ -12,9 +12,9 @@ services:
       - EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.io]
       - EMQX_LOADED_PLUGINS="emqx_recon,emqx_retainer,emqx_management,emqx_dashboard"
     volumes:
-      - emqx-data:/opt/emqx/data
-      - emqx-log:/opt/emqx/log
-      - emqx-etc:/opt/emqx/etc
+      - emqx4-data:/opt/emqx/data
+      - emqx4-log:/opt/emqx/log
+      - emqx4-etc:/opt/emqx/etc
     ports:
       - "1883:1883"  # mqtt:tcp
       - "1884:8883"  # mqtt:tcp:ssl
@@ -37,6 +37,6 @@ networks:
     driver: bridge
 
 volumes:
-  emqx-data: {}
-  emqx-log: {}
-  emqx-etc: {}
+  emqx4-data: {}
+  emqx4-log: {}
+  emqx4-etc: {}
